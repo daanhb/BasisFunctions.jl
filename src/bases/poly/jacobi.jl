@@ -11,16 +11,13 @@ struct Jacobi{T} <: OPS{T}
     α       ::  T
     β       ::  T
 
-    Jacobi{T}(n, α = zero(T), β = zero(T)) where {T} = new{T}(n, α, β)
+    Jacobi{T}(n, α = 0, β = 0) where {T} = new{T}(n, α, β)
 end
 
 Jacobi(n::Int) = Jacobi{Float64}(n)
-
-Jacobi(n::Int, α::Number, β::Number) = Jacobi(n, promote(α, β)...)
-
+Jacobi(n::Int, α, β) = Jacobi(n, promote(α, β)...)
 Jacobi(n::Int, α::T, β::T) where {T <: AbstractFloat} = Jacobi{T}(n, α, β)
-
-Jacobi(n::Int, α::Integer, β::Integer) = Jacobi(n, float(α), float(β))
+Jacobi(n::Int, α::S, β::S) where {S} = Jacobi(n, float(α), float(β))
 
 similar(b::Jacobi, ::Type{T}, n::Int) where {T} = Jacobi{T}(n, b.α, b.β)
 
@@ -30,7 +27,6 @@ first_moment(b::Jacobi{T}) where {T} = (b.α+b.β+1≈0) ?
     T(2).^(b.α+b.β+1)*gamma(b.α+1)*gamma(b.β+1) :
     T(2).^(b.α+b.β+1)*gamma(b.α+1)*gamma(b.β+1)/(b.α+b.β+1)/gamma(b.α+b.β+1)
     # 2^(b.α+b.β) / (b.α+b.β+1) * gamma(b.α+1) * gamma(b.β+1) / gamma(b.α+b.β+1)
-
 
 jacobi_α(b::Jacobi) = b.α
 jacobi_β(b::Jacobi) = b.β
@@ -42,11 +38,13 @@ iscompatible(d1::Jacobi, d2::Jacobi) = d1.α == d2.α && d1.β == d2.β
 isorthogonal(dict::Jacobi, measure::JacobiMeasure) =
 	dict.α == measure.α && dict.β == measure.β
 
+gauss_rule(dict::Jacobi) = GaussJacobi(length(dict), dict.α, dict.β)
+
 interpolation_grid(dict::Jacobi) = JacobiNodes(length(dict), dict.α, dict.β)
 iscompatible(dict::Jacobi, grid::JacobiNodes) =  length(dict) == length(grid) && dict.α ≈ grid.α && dict.β ≈ grid.β
-isorthogonal(dict::Jacobi, measure::JacobiGaussMeasure) = dict.α ≈ measure.α && dict.β ≈ measure.β && opsorthogonal(dict, measure)
+isorthogonal(dict::Jacobi, measure::GaussJacobi) = jacobi_α(dict) ≈ jacobi_α(measure) && jacobi_β(dict) ≈ jacobi_β(measure) && opsorthogonal(dict, measure)
 
-issymmetric(dict::Jacobi) = (dict.α)≈(dict.β)
+issymmetric(dict::Jacobi) = jacobi_α(dict)≈jacobi_β(dict)
 
 # See DLMF (18.9.2)
 # http://dlmf.nist.gov/18.9#i

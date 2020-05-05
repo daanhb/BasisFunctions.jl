@@ -245,7 +245,7 @@ function test_generic_dict_evaluation_different_grid(basis)
     end
 
     grid2 = EquispacedGrid(n+3, T(a)+test_tolerance(ELT), T(b)-test_tolerance(ELT))
-    z = e(grid2)
+    z = e(grid2; warnslow = false)
     @test z ≈ ELT[ e(grid2[i]) for i in eachindex(grid2) ]
 
     # Test evaluation on a grid of a single basis function

@@ -26,19 +26,19 @@ quadweights(grid::ChebyshevUNodes{T}, ::ChebyshevUMeasure{T}) where {T} =
     GridArrays.ChebyshevUWeights{T}(length(grid))
 
 quadweights(grid::LegendreNodes{T}, ::LegendreMeasure{T}) where {T} =
-    weights(LegendreGaussMeasure{T}(length(grid)))
+    weights(GaussLegendre{T}(length(grid)))
 
 function quadweights(grid::LaguerreNodes{T}, measure::LaguerreMeasure{T}) where {T}
 	@assert grid.α ≈ measure.α
-    weights(LaguerreGaussMeasure(length(grid),grid.α))
+    weights(GaussLaguerre(length(grid),grid.α))
 end
 
 quadweights(grid::HermiteNodes{T}, ::HermiteMeasure{T}) where {T} =
-    weights(HermiteGaussMeasure{T}(length(grid)))
+    weights(GaussHermite{T}(length(grid)))
 
 function quadweights(grid::JacobiNodes{T}, measure::JacobiMeasure{T}) where {T}
     @assert (grid.α ≈ measure.α) & (grid.β ≈ measure.β)
-	weights(JacobiGaussMeasure(length(grid), grid.α, grid.β))
+	weights(GaussJacobi(length(grid), grid.α, grid.β))
 end
 
 quadweights(grid::FourierGrid{T}, measure::FourierMeasure{T}) where {T} =

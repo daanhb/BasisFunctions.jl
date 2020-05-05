@@ -78,6 +78,8 @@ islooselycompatible(dict::Fourier, grid::AbstractEquispacedGrid) =
 
 interpolation_grid(b::Fourier{T}) where {T} = FourierGrid{T}(length(b))
 
+gauss_rule(dict::Fourier) = NormalizedDiracComb(interpolation_grid(dict))
+
 
 ##################
 # Native indices

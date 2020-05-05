@@ -9,7 +9,7 @@ function test_orthogonality_orthonormality(dict::Dictionary, isorthog::Bool, iso
 
     G = gram(dict, measure)
     @test eltype(G) == coefficienttype(dict)
-    M = Matrix(BasisFunctions.default_gram(dict, measure; atol=atol,rtol=rtol,opts...))
+    M = Matrix(BasisFunctions.default_gram(dict, measure; warnslow=false, atol=atol,rtol=rtol,opts...))
 
     if isorthog
         @test isdiag(G)

@@ -1,14 +1,9 @@
 
 innerproduct(f, g, measure; options...) = integral(x->conj(f(x))*g(x), measure)
 
-applymeasure(m::AbstractMeasure, f::Function; options...) = default_applymeasure(m, f; options...)
+applymeasure(μ::AbstractMeasure, f::Function; options...) = integral(f, μ)
 
-function default_applymeasure(measure::Measure, f::Function; options...)
-    @debug  "Applying measure $(typeof(measure)) numerically" maxlog=3
-    integral(f, measure)
-end
-
-iscomposite(m::Measure) = false
+iscomposite(μ::Measure) = false
 
 
 "A measure on a general domain with a general weight function `dσ = w(x) dx`."

@@ -23,7 +23,9 @@ isorthogonal(::Legendre, ::LegendreMeasure) = true
 issymmetric(::Legendre) = true
 interpolation_grid(dict::Legendre{T}) where T = LegendreNodes{T}(length(dict))
 iscompatible(dict::Legendre, grid::LegendreNodes) = length(dict) == length(grid)
-isorthogonal(dict::Legendre, measure::LegendreGaussMeasure) = opsorthogonal(dict, measure)
+isorthogonal(dict::Legendre, measure::GaussLegendre) = opsorthogonal(dict, measure)
+
+gauss_rule(dict::Legendre{T}) where T = GaussLegendre{T}(length(dict))
 
 function innerproduct_native(d1::Legendre, i::PolynomialDegree, d2::Legendre, j::PolynomialDegree, m::LegendreMeasure; options...)
 	T = coefficienttype(d1)

@@ -3,8 +3,6 @@
 # Generic evaluation
 #####################
 
-const BF_WARNSLOW = true
-
 "Compute the evaluation matrix of the given dict on the given set of points."
 function evaluation_matrix(Φ::Dictionary, pts, T = codomaintype(Φ))
     A = Array{T}(undef, length(pts), length(Φ))
@@ -36,8 +34,8 @@ evaluation(::Type{T}, Φ::Dictionary, grid::AbstractGrid; options...) where {T} 
 evaluation(::Type{T}, Φ::Dictionary, grid::AbstractSubGrid; options...) where {T} =
      restriction(T, supergrid(grid), grid; options...) * evaluation(T, Φ, supergrid(grid); options...)
 
-function evaluation(::Type{T}, Φ::Dictionary, gb::GridBasis, grid; options...) where {T}
-    @debug "No fast evaluation available in $grid for dictionary $Φ, using dense evaluation matrix instead."
+function evaluation(::Type{T}, Φ::Dictionary, gb::GridBasis, grid; warnslow = true, options...) where {T}
+    warnslow && @debug "No fast evaluation available in $grid for dictionary $Φ, using dense evaluation matrix instead."
     dense_evaluation(T, Φ, gb; options...)
 end
 

@@ -8,17 +8,12 @@ struct Laguerre{T} <: OPS{T}
     n       ::  Int
     α       ::  T
 
-    Laguerre{T}(n::Int, α = zero(T)) where {T} = new(n, α)
+	Laguerre{T}(n::Int, α = 0) where {T} = new{T}(n, α)
 end
 
-const Jacobi = Jacobi
-
 Laguerre(n::Int) = Laguerre{Float64}(n)
-
 Laguerre(n::Int, α::T) where {T <: AbstractFloat} = Laguerre{T}(n, α)
-
-Laguerre(n::Int, α::Integer) = Laguerre(n, float(α))
-
+Laguerre(n::Int, α::S) where {S} = Laguerre{float(S)}(n, α)
 
 similar(b::Laguerre, ::Type{T}, n::Int) where {T} = Laguerre{T}(n, b.α)
 
@@ -26,7 +21,7 @@ support(b::Laguerre{T}) where {T} = HalfLine{T}()
 
 first_moment(b::Laguerre{T}) where {T} = gamma(b.α+1)
 
-jacobi_α(b::Laguerre) = b.α
+laguerre_α(b::Laguerre) = b.α
 
 
 measure(b::Laguerre) = LaguerreMeasure(b.α)
@@ -34,19 +29,21 @@ measure(b::Laguerre) = LaguerreMeasure(b.α)
 iscompatible(d1::Laguerre, d2::Laguerre) = d1.α == d2.α
 interpolation_grid(dict::Laguerre) = LaguerreNodes(length(dict), dict.α)
 iscompatible(dict::Laguerre, grid::LaguerreNodes) = length(dict) == length(grid) && dict.α ≈ grid.α
-isorthogonal(dict::Laguerre, measure::LaguerreGaussMeasure) = dict.α ≈ measure.α && opsorthogonal(dict, measure)
+isorthogonal(dict::Laguerre, measure::GaussLaguerre) = laguerre_α(dict) ≈ laguerre_α(measure) && opsorthogonal(dict, measure)
 
-isorthonormal(dict::Laguerre, measure::LaguerreMeasure) = isorthogonal(dict, measure) && dict.α == 0
-isorthonormal(dict::Laguerre, measure::LaguerreGaussMeasure) where T = isorthogonal(dict, measure) && dict.α == 0
+isorthonormal(dict::Laguerre, measure::LaguerreMeasure) = isorthogonal(dict, measure) && laguerre_α(dict) == 0
+isorthonormal(dict::Laguerre, measure::GaussLaguerre) where T = isorthogonal(dict, measure) && laguerre_α(dict) == 0
 issymmetric(::Laguerre) = false
 
 isorthogonal(dict::Laguerre, measure::LaguerreMeasure) = dict.α == measure.α
+
+gauss_rule(dict::Laguerre) = GaussLaguerre(length(dict), dict.α)
 
 function innerproduct_native(d1::Laguerre, i::PolynomialDegree, d2::Laguerre, j::PolynomialDegree, measure::LaguerreMeasure; options...)
 	T = coefficienttype(d1)
 	if iscompatible(d1, d2) && isorthogonal(d1, measure)
 		if i == j
-			gamma(convert(T, value(i)+1+jacobi_α(d1))) / convert(T, factorial(value(i)))
+			gamma(convert(T, value(i)+1+laguerre_α(d1))) / convert(T, factorial(value(i)))
 		else
 			zero(T)
 		end

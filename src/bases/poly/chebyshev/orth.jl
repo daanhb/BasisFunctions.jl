@@ -2,11 +2,14 @@
 isorthogonal(::ChebyshevU, ::ChebyshevUMeasure) = true
 isorthogonal(::ChebyshevT, ::ChebyshevTMeasure) = true
 
-isorthogonal(dict::ChebyshevU, measure::ChebyshevUGaussMeasure) = opsorthogonal(dict, measure)
-isorthogonal(dict::ChebyshevT, measure::ChebyshevTGaussMeasure) = opsorthogonal(dict, measure)
+isorthogonal(dict::ChebyshevU, measure::GaussChebyshevU) = opsorthogonal(dict, measure)
+isorthogonal(dict::ChebyshevT, measure::GaussChebyshevT) = opsorthogonal(dict, measure)
 
 const UniformDiscreteChebyshevTMeasure{T,G,W} = GenericDiscreteMeasure{T,G,W} where G <: ChebyshevNodes where W <:FillArrays.AbstractFill
-isorthogonal(dict::ChebyshevT, measure::BasisFunctions.UniformDiscreteChebyshevTMeasure) = BasisFunctions.opsorthogonal(dict, measure)
+isorthogonal(dict::ChebyshevT, measure::UniformDiscreteChebyshevTMeasure) = BasisFunctions.opsorthogonal(dict, measure)
+
+gauss_rule(dict::ChebyshevT{T}) where T = GaussChebyshevT{T}(length(dict))
+gauss_rule(dict::ChebyshevU{T}) where T = GaussChebyshevU{T}(length(dict))
 
 function gram(::Type{T}, dict::ChebyshevT, ::ChebyshevMeasure; options...) where {T}
 	diag = zeros(T, length(dict))
@@ -18,7 +21,7 @@ end
 gram(::Type{T}, dict::ChebyshevU, ::ChebyshevUMeasure; options...) where {T} =
 	ScalingOperator(convert(T, pi)/2, dict)
 
-function diagonal_gram(dict::ChebyshevT, measure::ChebyshevTGaussMeasure; options...) where {T}
+function diagonal_gram(::Type{T}, dict::ChebyshevT, measure::GaussChebyshevT; options...) where {T}
     @assert isorthogonal(dict, measure)
     if length(dict) == length(points(measure))
         CoefficientScalingOperator{T}(dict, 1, convert(T,2))*ScalingOperator{T}(dict, convert(T,pi)/2)

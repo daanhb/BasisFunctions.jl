@@ -1,10 +1,6 @@
 
 @deprecate grid(m::DiscreteMeasure) points(m)
 
-function default_applymeasure(measure::DiscreteMeasure, f::Function; options...)
-    integral(f, measure; options...)
-end
-
 
 struct GenericDiscreteMeasure{T,GRID<:AbstractGrid,W} <: DiscreteMeasure{T}
     points    ::  GRID
@@ -82,69 +78,16 @@ function stencilarray(m::DiscreteProductMeasure)
     A
 end
 
-struct ChebyshevTGaussMeasure{T} <:DiscreteMeasure{T}
-    points  :: GridArrays.ChebyshevTNodes{T}
-    weights :: GridArrays.ChebyshevTWeights{T}
-    function ChebyshevTGaussMeasure{T}(n::Int) where T
-        x, w = GridArrays.gausschebyshev(T,n)
-        new{T}(x, w)
-    end
-    ChebyshevTGaussMeasure(n::Int) = ChebyshevTGaussMeasure{Float64}(n)
+
+"A discrete measure that represents a quadrature rule."
+struct QuadratureMeasure{T,P,W} <: DiscreteMeasure{T}
+    points  ::  P
+    weights ::  W
 end
 
-struct ChebyshevUGaussMeasure{T} <:DiscreteMeasure{T}
-    points :: GridArrays.ChebyshevUNodes{T}
-    weights:: GridArrays.ChebyshevUWeights{T}
-    function ChebyshevUGaussMeasure{T}(n::Int) where T
-        x, w = GridArrays.gausschebyshevu(T,n)
-        new{T}(x, w)
-    end
-end
-ChebyshevUGaussMeasure(n::Int) = ChebyshevUGaussMeasure{Float64}(n)
+QuadratureMeasure(points::AbstractArray{T}, weights) where {T} =
+    QuadratureMeasure{T}(points, weights)
+QuadratureMeasure{T}(points::P, weights::W) where {T,P,W} =
+    QuadratureMeasure{T,P,W}(points, weights)
 
-struct LegendreGaussMeasure{T} <: DiscreteMeasure{T}
-    points  :: GridArrays.LegendreNodes{T}
-    weights :: GridArrays.LegendreWeights{T}
-
-    function LegendreGaussMeasure{T}(n::Int) where T
-        x, w = GridArrays.gausslegendre(T, n)
-        new{T}(x, w)
-    end
-end
-LegendreGaussMeasure(n::Int) = LegendreGaussMeasure{Float64}(n)
-
-struct LaguerreGaussMeasure{T} <: DiscreteMeasure{T}
-    α       :: T
-    points  :: GridArrays.LaguerreNodes{T}
-    weights :: GridArrays.LaguerreWeights{T}
-
-    function LaguerreGaussMeasure{T}(n::Int, α::T) where T
-        x, w = GridArrays.gausslaguerre(T, n, α)
-        new{T}(α, x, w)
-    end
-end
-LaguerreGaussMeasure(n::Int, α::T) where T = LaguerreGaussMeasure{T}(n, α)
-
-struct HermiteGaussMeasure{T} <: DiscreteMeasure{T}
-    points  :: GridArrays.HermiteNodes{T}
-    weights :: GridArrays.HermiteWeights{T}
-
-    function HermiteGaussMeasure{T}(n::Int) where T
-        x, w = GridArrays.gausshermite(T,n)
-        new{T}(x, w)
-    end
-end
-HermiteGaussMeasure(n::Int) = HermiteGaussMeasure{Float64}(n)
-
-struct JacobiGaussMeasure{T} <: DiscreteMeasure{T}
-    α       :: T
-    β       :: T
-    points  :: GridArrays.JacobiNodes{T}
-    weights :: GridArrays.JacobiWeights{T}
-
-    function JacobiGaussMeasure{T}(n::Int, α::T, β::T) where T
-        x, w = GridArrays.gaussjacobi(T, n, α, β)
-        new{T}(α, β, x, w)
-    end
-end
-JacobiGaussMeasure(n::Int, α::T, β::T) where T = JacobiGaussMeasure{T}(n, α, β)
+name(m::QuadratureMeasure) = "Quadrature measure"

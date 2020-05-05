@@ -30,6 +30,7 @@ restriction(::Type{T}, src::Monomials, dest::Monomials; options...) where {T} =
     IndexRestriction{T}(src, dest, 1:length(dest))
 
 
+"A monomial basis function `x^i`."
 struct Monomial{T} <: Polynomial{T}
     degree  ::  Int
 end

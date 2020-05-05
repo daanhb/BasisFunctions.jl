@@ -1,7 +1,0 @@
-gauss_rule(dict::ChebyshevT{T}) where T = ChebyshevTGaussMeasure{T}(length(dict))
-gauss_rule(dict::ChebyshevU{T}) where T = ChebyshevUGaussMeasure{T}(length(dict))
-gauss_rule(dict::Legendre{T}) where T = LegendreGaussMeasure{T}(length(dict))
-gauss_rule(dict::Hermite{T}) where T = HermiteGaussMeasure{T}(length(dict))
-gauss_rule(dict::Laguerre) = LaguerreGaussMeasure(length(dict), dict.α)
-gauss_rule(dict::Jacobi) = JacobiGaussMeasure(length(dict), dict.α, dict.β)
-gauss_rule(dict::Fourier) = NormalizedDiracComb(interpolation_grid(dict))
