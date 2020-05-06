@@ -25,15 +25,8 @@ name(b::Fourier) = "Fourier series"
 # The default numeric type is Float64
 Fourier(n::Int) = Fourier{Float64}(n)
 
-# Convenience constructor: map the Fourier series to the interval [a,b]
-function Fourier(n, a::Number, b::Number)
-	@warn "The syntax Fourier(n, a, b) is deprecated. Please use Fourier(n) → a..b instead (the symbol → is \\Rightarrow)"
-	Fourier(n) → a..b
-end
-function Fourier{T}(n, a::Number, b::Number) where {T}
-	@warn "The syntax Fourier{T}(n, a, b) is deprecated. Please use Fourier{T}(n) → a..b instead (the symbol → is \\Rightarrow)"
-	Fourier(n) → a..b
-end
+@deprecate Fourier(n, a::Number, b::Number) Fourier(n)→a..b
+@deprecate Fourier{T}(n, a::Number, b::Number) where {T} Fourier(n)→a..b
 
 size(b::Fourier) = (b.n,)
 
